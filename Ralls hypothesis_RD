@@ -1,0 +1,97 @@
+#### this hypothesis stems from the notion that dendrites acticated have to be from far the near to cause a spike ####
+#### This is becuase it will integrate and generate a large depolarization, if it goes from near to back the depolarization ####
+#### will not occur at the same time and will end up lagging in intermittent spikes####
+
+# point of program is to simulate the back to front nature of the nodes
+
+class Node:
+    ### this connected variable is shared by all nodes
+    def __init__(self, name):
+        self.nam = name
+        self.identConnect = []
+        self.outputVal = []
+    def connect(self, nod, point):
+        #### connects to node and an indicated point ####
+        self.identConnect.append([nod, point])
+    def associate(self, val):
+        self.outputVal.append(val)
+
+
+#### connects axon of node1 to dendrite of node2 at input_num """area of integration"""" #####
+def coupling(node1, node2, input_num):
+    #### point of 0 is used as the axon
+    node1.connect(node2, 0)
+    node2.connect(node1, input_num)
+
+
+### again traces connections in the network
+def nodeNetwork(node_list):
+    Nlist = []
+    for i in range(len(node_list)):
+            for e in range (len(node_list)):
+                for p in range(len(node_list)):
+                    try:
+                        if node_list[i+e] in node_list[i].identConnect[p]:
+                            Nlist.append([node_list[i], node_list[i+e]])
+                    except IndexError:
+                        continue
+    return Nlist
+
+#### keep this node list architecture becuase it develops the node connects without any bias twoards which node-set may come first
+
+
+
+### considers each step as an interation of the for loop (connections will go down 3, 2, 1)
+### will only fire if two signals are incoming
+#### prints iterations along with state of signals location
+def firing(node_list, iterations):
+    liss = nodeNetwork(node_list)
+    title = []
+    term = []
+    for j in range(len(node_list)):
+        title.append(node_list[j].nam)
+        term.append(0)
+
+    print(title)
+
+    #### establishing inital condition
+    for k in range(len(liss)):
+        try:
+            if liss[k][1] != liss[k+1][1]:
+                numb = node_list.index(liss[k][1])
+                term[numb] = 1
+        except IndexError:
+            continue
+    print(term)
+    ### prints inital condition and title by now below starts the main iterations and function
+
+   for i in range(iterations):
+        Depol_init = False
+
+
+
+       if Depol_init == True:
+
+
+
+
+#### x at the moment doesnt do anything but i mean not that hard to change the set up code to do this
+######################################### to change  #############################################################
+#### change node_list[0][0].associate(new_num) to be new_num = porn(node_list[0][0], first_num) ##########
+
+x = Node("x")
+y = Node("y")
+z = Node("z")
+w = Node("w")
+
+coupling(x, y, 3)
+coupling(z, y, 2)
+coupling(y, w, 1)
+NNet = [x, z, y, w]
+
+lis = nodeNetwork(NNet)
+print(NNet)
+print(lis)
+firing(NNet, 10)
+
+#### plus with the current node development net as long as you dont put later nodes before earlier ones you dont need strict order
