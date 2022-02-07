@@ -1,0 +1,85 @@
+class Node:
+    ### this connected variable is shared by all nodes
+    def __init__(self, type):
+        dictType = {1: "Red", 2: "Blue", 3: "Green"}
+        self.typing = dictType[type]
+        self.connected = False
+        self.identConnect = []
+        self.outputVal = []
+    def connect(self, nod):
+        self.connected = True
+        self.identConnect.append(nod)
+    def associate(self, val):
+        self.outputVal.append(val)
+
+def coupling(node1, node2):
+    node1.connect(node2)
+    node2.connect(node1)
+
+def nodeNetwork(node_list):
+    Nlist = []
+    for i in range(len(node_list)):
+            for e in range (len(node_list)):
+                try:
+                    if node_list[i+e] in node_list[i].identConnect:
+                        Nlist.append([node_list[i], node_list[i+e]])
+                except IndexError:
+                    continue
+    return Nlist
+
+#### keep this node list architecture becuase it develops the node connects without any bias twoards which node-set may come first
+
+
+###### applications of this include literally using first num as an """x""" in a fxn to do crazy stuff (obviously nnets but like yah)
+def porn(node, first_num):
+    new_num = 0
+    if node.typing == "Blue":
+        new_num = first_num + 30
+    elif node.typing == "Red":
+        new_num = first_num - 20
+    elif node.typing == "Green":
+        new_num = first_num / 2
+
+    return new_num
+
+def conct(node_list, first_num):
+    based_list = []
+    node_list[0][0].associate(first_num)
+    for i in range(0, len(node_list)):
+        try:
+            new_val = porn(node_list[i][1], node_list[i][0].outputVal[0])
+            based_list.append(new_val)
+            node_list[i][1].associate(new_val)
+        except IndexError:
+            break
+    return based_list
+
+
+x = Node(1)
+#### x at the moment doesnt do anything but i mean not that hard to change the set up code to do this
+######################################### to change  #############################################################
+#### change node_list[0][0].associate(new_num) to be new_num = porn(node_list[0][0], first_num) ##########
+y = Node(2) ### + 30
+z = Node(3) ### /2
+w = Node(1) ### -20
+q = Node(3) ### /2
+a = Node(2) ### + 30
+
+
+#### now attempting a double branch like x to y -- > (z to w)
+####                                            -- > (q to a)
+
+coupling(x, y)
+coupling(y, z)
+coupling(z, w)
+coupling(y, q)
+coupling(q, a)
+
+#### plus with the current node development net as long as you dont put later nodes before earlier ones you dont need strict order
+NNet = [x, y, z, w, q, a]
+lis = nodeNetwork(NNet)
+print(lis)
+
+
+based = conct(lis, 1)
+print(based)
