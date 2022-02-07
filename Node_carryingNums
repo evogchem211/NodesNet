@@ -1,0 +1,83 @@
+class Node:
+    ### this connected variable is shared by all nodes
+    def __init__(self, type):
+        dictType = {1: "Red", 2: "Blue", 3: "Green"}
+        self.typing = dictType[type]
+        self.connected = False
+        self.identConnect = []
+    def connect(self, state, nod):
+        if state == 1:
+             self.connected = True
+             self.identConnect.append(nod)
+
+def coupling(node1, node2):
+    node1.connect(1, node2)
+    node2.connect(1, node1)
+
+def porn(node, first_num):
+    new_num = 0
+    if node.typing == "Blue":
+        new_num = first_num + 30
+        ### add 30
+    elif node.typing == "Red":
+        new_num = first_num - 20
+    elif node.typing == "Green":
+        new_num = first_num / 2
+
+    return new_num
+
+x = Node(1)
+y = Node(2)
+z = Node(3)
+### x to y to z
+coupling(x, y)
+coupling(y, z)
+
+### attempt to trace a path
+def nodelist(first_node):
+    Nlist = []
+    if first_node.connected == True:
+        Nlist.append(first_node)
+        ### is identConnect[0] when only connected to one node
+        ### range may have to be manually adjusted bc len of nodes is variable to connections later on
+        for i in range(2):
+            next_node = first_node.identConnect[0]
+            for i in range(len(Nlist)):
+                if next_node is Nlist[i]:
+                    next_node = first_node.identConnect[1]
+            Nlist.append(next_node)
+            first_node = next_node
+    return(Nlist)
+
+### attempt to trace a path
+def nodelist2(first_node):
+    Nlist = []
+    if first_node.connected == True:
+        Nlist.append(first_node)
+        ### is identConnect[0] when only connected to one node
+        ### range may have to be manually adjusted bc len of nodes is variable to connections later on
+        for i in range(2):
+            new_iter = iter(first_node.identConnect)
+            next_node = next(new_iter)
+            for i in range(len(Nlist)):
+                if next_node is Nlist[i]:
+                    next_node = next(new_iter)
+
+            Nlist.append(next_node)
+            first_node = next_node
+    return(Nlist)
+
+
+def carrying(first_num, node_list):
+    Returned_list = []
+    base_num = first_num
+    for i in range(0, len(node_list)):
+        returned_num = porn(node_list[i], base_num)
+        Returned_list.append(returned_num)
+        base_num = returned_num
+    return(Returned_list)
+
+N_list = nodelist(x)
+print(N_list)
+based = carrying(1, N_list)
+print(based)
