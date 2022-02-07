@@ -1,0 +1,101 @@
+import numpy as np
+
+class Node:
+    ### this connected variable is shared by all nodes
+    def __init__(self, type):
+        dictType = {1: "Red", 2: "Blue", 3: "Green"}
+        self.typing = dictType[type]
+        self.connected = False
+        self.identConnect = []
+        self.outputVal = []
+    def connect(self, state, nod):
+        if state == 1:
+             self.connected = True
+             self.identConnect.append(nod)
+    def associate(self, val):
+        self.outputVal.append(val)
+
+def coupling(node1, node2):
+    node1.connect(1, node2)
+    node2.connect(1, node1)
+
+def nodeNetwork(node_list):
+    Nlist = []
+    for i in range(len(node_list)):
+            for e in range (len(node_list)):
+                try:
+                    if node_list[i+e] in node_list[i].identConnect:
+                        Nlist.append([node_list[i], node_list[i+e]])
+                except IndexError:
+                    continue
+    return Nlist
+
+def porn(node, first_num):
+    new_num = 0
+    if node.typing == "Blue":
+        new_num = first_num + 30
+    elif node.typing == "Red":
+        new_num = first_num - 20
+    elif node.typing == "Green":
+        new_num = first_num / 2
+
+    return new_num
+
+def connection(node_connections, first_num):
+    base_num = porn(node_connections[0][1], first_num)
+    node_connections[0][1].associate(base_num)
+    base_list = []
+
+    base_list.append(base_num)
+    for i in range(0, len(node_connections)):
+        try:
+            if node_connections[i][1] is node_connections[i+1][0]:
+                ### condition for following one after another
+                new_val = porn(node_connections[i+1][1], base_num)
+                base_num = new_val
+                #### saves the number into a list to be used incase of divergence
+                base_list.append(base_num)
+                node_connections[i+1][1].associate(base_num)
+
+            elif node_connections[i][0] is node_connections[i+1][0]:
+                ### condition for going back after indicating a new path
+                new_base = node_connections[i][0].outputVal[0]
+                new_val = porn(node_connections[i+1][1], new_base)
+                base_num = new_val
+                base_list.append(base_num)
+
+
+
+        except IndexError:
+            break
+    return base_list
+
+
+
+
+x = Node(1)
+y = Node(2) ### + 30
+z = Node(3) ### /2
+w = Node(1) ### -20
+q = Node(3) ### /2
+
+
+#### now attempting a double branch like x to y -- > (z to w)
+####                                            -- > (q to a)
+
+coupling(x, y)
+coupling(y, z)
+coupling(y, w)
+coupling(y, q)
+
+NNet = [x, y, z, w, q]
+
+lis = nodeNetwork(NNet)
+
+print(lis)
+
+based = connection(lis, 1)
+
+print(based)
+##### then again this code only works when starting with a single input
+
