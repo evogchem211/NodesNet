@@ -1,0 +1,107 @@
+import random
+
+class Node:
+    ### this connected variable is shared by all nodes
+
+    def __init__(self, pre, post, name, Innervating, Recieving):
+        ### these dict types correlate to the type of postsynapticfxn
+        postsynType = {1: "fxn1", 2: "fxn2", 3: "fxn3"}
+        presynType = {1: "fxn1a", 2: "fxn2a", 3: "fxn3a"}
+
+        self.nam = name
+        self.presynapsefxn = presynType[pre]
+        self.postynapsefxn = postsynType[post]
+        ### these intrinsic functions get utilized when called in a def fxn the wholistic synaptic function should not be utilzied in the class itself
+        self.synapseON = False
+        ### self.connected just serves as a backup to show if the synapse is indeed connected
+        self.identConnectINOUT = []
+        self.outputVal = []
+        self.identConnectINOUT.append([Innervating, Recieving])
+
+
+def nodeNetwork(node_list):
+    Nlist = []
+    for i in range(len(node_list)):
+        for e in range(len(node_list)):
+            try:
+                if node_list[i + e] in node_list[i].identConnectINOUT:
+                    Nlist.append([node_list[i].nam, node_list[i + e].nam])
+            except IndexError:
+                continue
+    return Nlist
+
+
+### literally just a randomly generated list of dendriets.
+alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+            'v', 'w', 'x', 'y', 'z']
+ND = []
+for i in range(6):
+    cum = random.randint(1, 26)
+    # ND.append(Node(random.randint(1,3), alphabet[cum]).nam)
+
+
+#### going to try to remove this problem of requiring dendrites before super nodes ---> i mean we cant have a neuron without its dendrites, temproary user controlled dendrites for right now.
+
+class Super_node:
+    def __init__(self, Pos):
+        self.fire = False
+        self.Position = Pos
+        self.Threshold = 12
+        self.Incoming = []
+        self.Outgoing = []
+
+    def connect(self, SPnodePop):
+        for i in range(len(SPnodePop)):
+            distance = (((self.Position[0] - SPnodePop[i].Position[0]) ** 2) + (
+                        self.Position[1] - SPnodePop[i].Position[1]) ** 2) ** (0.5)
+            if distance <= 4:
+                if self != SPnodePop[i]:
+                    self.connected = True
+                    rand1, rand2, rand3 = random.randint(1, 3), random.randint(1, 3), random.randint(1, 10)
+                    Nod = Node(rand1, rand2, alphabet[rand3], self, SPnodePop[i])
+                    self.Outgoing.append(Nod)
+                    SPnodePop[i].Incoming.append(Nod)
+
+    def Firing(self, Mem_potent):
+        if Mem_potent >= self.Threshold:
+            self.fire = True
+        if self.fire == True:
+            for i in range(len(self.Outgoing)):
+                self.Outgoing[i].synapseON = True
+
+
+### could combine these two functions as the following function below to output a whole ass network which is already connected.
+
+def SuperNodeNet(lower_bound, upper_bound, NodeNumber):
+    SuperNodePop = []
+    for i in range(NodeNumber):
+        rand1, rand2 = random.randint(lower_bound, upper_bound), random.randint(lower_bound, upper_bound)
+        SuperNodePop.append(Super_node([rand1, rand2]))
+    for i in range(len(SuperNodePop)):
+        SuperNodePop[i].connect(SuperNodePop)
+    return SuperNodePop
+
+
+SuperNodePopulation = SuperNodeNet(-10, 10, 30)
+
+import matplotlib.pyplot as plt
+
+plt.xlabel("X")
+plt.ylabel("Y")
+
+### this is honestly bloated as hell but it works
+for i in range(len(SuperNodePopulation)):
+    plt.scatter(SuperNodePopulation[i].Position[0], SuperNodePopulation[i].Position[1], s=50, color="black")
+    for e in range(len(SuperNodePopulation)):
+        for j in range(len(SuperNodePopulation)):
+            for p in range(len(SuperNodePopulation)):
+                try:
+                    if SuperNodePopulation[i].Outgoing[j] == SuperNodePopulation[e].Incoming[p]:
+                        plt.plot([SuperNodePopulation[i].Position[0], SuperNodePopulation[e].Position[0]], [SuperNodePopulation[i].Position[1], SuperNodePopulation[e].Position[1]])
+                        Xmid, Ymid = (SuperNodePopulation[i].Position[0] + SuperNodePopulation[e].Position[0])/2, (SuperNodePopulation[i].Position[1] + SuperNodePopulation[e].Position[1])/2
+                        plt.scatter(Xmid, y=Ymid, s = 20, alpha=0.1, color = "blue")
+                except IndexError:
+                    continue
+
+#### when this plot shows the transparent dots are the synaptic nodes and the black ones are the superNodes
+plt.show()
