@@ -1,0 +1,42 @@
+import random
+
+### the network you input into the KNN class should have its own predefined class (the super node class)
+
+class Point:
+    def __init__(self, Pos, type, name):
+        self.nam = name
+        dictType = {1: "Red", 2: "Blue", 3: "Green"}
+        self.typing = dictType[type]
+        self.Position = Pos
+
+
+
+
+def KNN(Network):
+    Net = Network
+    NodeNearestlist = []
+    for i in range(len(Network)):
+        temp_num = []
+        for e in range(len(Network)):
+            if i != e:
+                distance = (((Net[i].Position[0] - Net[e].Position[0]) ** 2) + (Net[e].Position[1] - Net[i].Position[1]) ** 2) ** (0.5)
+                temp_num.append(distance)
+
+                if e + 1 == len(Net):
+                    ind = temp_num.index(min(temp_num))
+                    ### returns one point the point its cloest to and its distance to that point
+                    NodeNearestlist.append([Net[i].nam, Net[ind].nam, min(temp_num)])
+    return NodeNearestlist
+
+alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+            'v', 'w', 'x', 'y', 'z']
+PointNetwork = []
+for i in range(15):
+    rand1, rand2, rand3, rand4 = random.randint(1, 3), random.randint(-5, 5), random.randint(-5, 5), random.randint(2, 17)
+    PointNetwork.append(Point([rand2, rand3], rand1, alphabet[rand4]))
+
+print(PointNetwork)
+
+knn = KNN(PointNetwork)
+
+print(knn)
